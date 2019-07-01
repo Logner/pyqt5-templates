@@ -1,13 +1,19 @@
 # PYQT5 template for easy spreadsheet manipulation
 
+# all updates and saves to the table are controlled through these variables.
+# ctr represents the current available (empty) row
+# len(Col_labels) is key to much of the iterative logic.
 ctr = 0
 Col_labels = ['Name','Date', 'Code', 'Quantity', 'Total Price', 'Comments']
+csv_save_location = "test.csv"
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from datetime import datetime
 import csv
 
-#custom
+# This is a getter function defined outside of the main Ui object. 
+# Useful if you will be working with constantly Changing data (i.e. time).
+# Please change this function to fit the size of your table and inputs, etc etc...
 def get_table_items():
     global ctr
     lst = ['item %d' % ctr,
@@ -53,10 +59,10 @@ class Ui_DockWidget(object):
         _translate = QtCore.QCoreApplication.translate
         DockWidget.setWindowTitle(_translate("DockWidget", "DockWidget"))
         self.Update.setText(_translate("DockWidget", "Update"))
-        self.Delete.setText(_translate("DockWidget", "Delete"))
-        self.Add.setText(_translate("DockWidget", "Add"))
+        self.Delete.setText(_translate("DockWidget", "Delete Row"))
+        self.Add.setText(_translate("DockWidget", "Add Row"))
 
-    #custom
+    # Generates a new row using a list output from get_table_items()
     def AddRow(self):
         global ctr
         lst = get_table_items()
@@ -67,8 +73,9 @@ class Ui_DockWidget(object):
         ctr += 1
         print('row %s added' % ctr)
 
+    # makes a csv with current table elements    
     def updateCSV(self):
-        wr = open('test.csv', 'w', newline='')
+        wr = open(csv_save_location, 'w', newline='')
         w = csv.writer(wr, delimiter=',', quotechar="|", quoting=csv.QUOTE_MINIMAL)
         row = ctr
         lst = []
@@ -85,6 +92,7 @@ class Ui_DockWidget(object):
         
         wr.close()
 
+    # deletes the whole row of a currently selected cell, moves all other entries below that cell up 1 row.
     def delRow(self):
         global ctr
         _ti = QtWidgets.QTableWidgetItem
